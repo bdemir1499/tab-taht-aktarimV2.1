@@ -8165,7 +8165,7 @@ tonyBtn.onclick = async () => {
         });
 
         hands.setOptions({
-            selfieMode: true, maxNumHands: 2, // İKİ EL DESTEĞİ
+            maxNumHands: 2, // İKİ EL DESTEĞİ
             modelComplexity: 1,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
@@ -8181,7 +8181,7 @@ tonyBtn.onclick = async () => {
                 const hand1 = results.multiHandLandmarks[0];
                 
                 // Lazer İmleci Çiz
-                const px1 = hand1[8].x * window.innerWidth;
+                const px1 = (1 - hand1[8].x) * window.innerWidth; // Aynalama
                 const py1 = hand1[8].y * window.innerHeight;
                 laserCursor.style.display = 'block';
                 laserCursor.style.left = px1 + 'px';
