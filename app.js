@@ -8165,7 +8165,7 @@ tonyBtn.onclick = async () => {
         });
 
         hands.setOptions({
-            maxNumHands: 2, // İKİ EL DESTEĞİ
+            selfieMode: true, maxNumHands: 2, // İKİ EL DESTEĞİ
             modelComplexity: 1,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
