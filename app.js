@@ -8058,8 +8058,10 @@ canvasKatmanZirhi.innerHTML = `
     }
 `;
 document.head.appendChild(canvasKatmanZirhi);
+
+
 // ==========================================
-// --- TONY STARK MODU (KAPALI DEVRE) ---
+// --- TONY STARK MODU (İLERİ DÜZEY GESTURES) ---
 // ==========================================
 function loadScript(src) {
     return new Promise((resolve, reject) => {
@@ -8072,32 +8074,67 @@ function loadScript(src) {
 }
 
 const tonyBtn = document.createElement('button');
-tonyBtn.innerHTML = 'Sihirli El';
-tonyBtn.style.position = 'absolute';
-tonyBtn.style.top = '20px';
-tonyBtn.style.left = '50%'; tonyBtn.style.transform = 'translateX(-50%)';
-tonyBtn.style.zIndex = '99999';
-tonyBtn.style.padding = '12px 20px';
-tonyBtn.style.fontSize = '16px';
-tonyBtn.style.backgroundColor = 'rgba(0, 255, 204, 0.1)';
-tonyBtn.style.border = '2px solid #00ffcc';
+tonyBtn.className = 'tool-button';
+tonyBtn.style.position = 'static';
+tonyBtn.style.transform = 'none';
+tonyBtn.style.width = '100%';
+tonyBtn.style.marginTop = '10px';
+tonyBtn.style.padding = '10px 0';
+tonyBtn.style.fontSize = '12px';
+tonyBtn.style.borderRadius = '10px';
+tonyBtn.style.backgroundColor = 'rgba(0, 150, 255, 0.2)';
+tonyBtn.style.border = '2px solid #0096ff';
 tonyBtn.style.color = '#fff';
-tonyBtn.style.borderRadius = '20px';
 tonyBtn.style.cursor = 'pointer';
-tonyBtn.style.boxShadow = '0 0 10px rgba(0,255,204,0.5)';
-tonyBtn.style.backdropFilter = 'blur(5px)';
-tonyBtn.style.fontFamily = 'monospace';
 tonyBtn.style.fontWeight = 'bold';
+tonyBtn.innerHTML = '🖐️ Sihirli El';
 
-document.body.appendChild(tonyBtn);
+const oyunlarBtn = document.getElementById('btn-oyunlar');
+if (oyunlarBtn && oyunlarBtn.parentNode) {
+    oyunlarBtn.parentNode.appendChild(tonyBtn);
+} else {
+    document.body.appendChild(tonyBtn);
+}
+
+// Lazer İmleci
+const laserCursor = document.createElement('div');
+laserCursor.style.position = 'absolute';
+laserCursor.style.width = '20px';
+laserCursor.style.height = '20px';
+laserCursor.style.borderRadius = '50%';
+laserCursor.style.backgroundColor = '#00ffff'; // Iron Man Blue
+laserCursor.style.boxShadow = '0 0 15px 5px rgba(0, 255, 255, 0.8)';
+laserCursor.style.pointerEvents = 'none';
+laserCursor.style.zIndex = '999999';
+laserCursor.style.display = 'none';
+laserCursor.style.transform = 'translate(-50%, -50%)';
+document.body.appendChild(laserCursor);
 
 let tonyActive = false;
 let camera = null;
 let hands = null;
 
+function calculateDistance(p1, p2) {
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
 tonyBtn.onclick = async () => {
-    if (tonyActive) return;
-    tonyBtn.innerHTML = '⏳ Yükleniyor... (KVKK)';
+    if (tonyActive) {
+        if (camera) { camera.stop(); camera = null; }
+        if (hands) { hands.close(); hands = null; }
+        const vid = document.getElementById('tony-video-elem');
+        if (vid) { vid.remove(); }
+        tonyActive = false;
+        laserCursor.style.display = 'none';
+        tonyBtn.innerHTML = '🖐️ Sihirli El';
+        tonyBtn.style.borderColor = '#0096ff';
+        tonyBtn.style.boxShadow = 'none';
+        return;
+    }
+
+    tonyBtn.innerHTML = '⏳ (KVKK)';
     tonyBtn.style.borderColor = '#ffff00';
     tonyBtn.style.boxShadow = '0 0 10px rgba(255,255,0,0.5)';
 
@@ -8105,55 +8142,144 @@ tonyBtn.onclick = async () => {
         await loadScript('mediapipe/camera_utils.js');
         await loadScript('mediapipe/hands.js');
 
-        const videoElement = document.createElement('video'); videoElement.id = 'tony-video-elem';
+        const videoElement = document.createElement('video');
+        videoElement.id = 'tony-video-elem';
         videoElement.style.display = 'none';
         document.body.appendChild(videoElement);
 
         hands = new window.Hands({
-            locateFile: (file) => {
-                return 'mediapipe/' + file;
-            }
+            locateFile: (file) => 'mediapipe/' + file
         });
 
         hands.setOptions({
-            maxNumHands: 1,
+            maxNumHands: 2, // İKİ EL DESTEĞİ
             modelComplexity: 1,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
         });
 
-        let startX = 0;
-        let startY = 0;
+        let startX = 0, startY = 0;
+        let startScaleDistance = 0, startScale = 1;
+        let startOpenDistance = 0, startOpenRatio = 0;
 
         hands.onResults((results) => {
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const indexFinger = results.multiHandLandmarks[0][8];
-                const px = indexFinger.x * window.innerWidth;
-                const py = indexFinger.y * window.innerHeight;
+                const isTwoHands = results.multiHandLandmarks.length === 2;
+                const hand1 = results.multiHandLandmarks[0];
+                
+                // Lazer İmleci Çiz
+                const px1 = hand1[8].x * window.innerWidth;
+                const py1 = hand1[8].y * window.innerHeight;
+                laserCursor.style.display = 'block';
+                laserCursor.style.left = px1 + 'px';
+                laserCursor.style.top = py1 + 'px';
+                
+                // Kavrama Kontrolü (Başparmak [4] ve İşaret Parmağı [8])
+                const pinchDist1 = calculateDistance(hand1[4], hand1[8]);
+                const isPinched1 = pinchDist1 < 0.05; // 0.05 ekrana göre çok yakın (tutma)
 
                 if (window.Scene3D && window.Scene3D.currentMesh) {
-                    if (startX !== 0 && startY !== 0) {
-                        const dx = px - startX;
-                        const dy = py - startY;
+                    const mesh = window.Scene3D.currentMesh;
+                    
+                    if (isTwoHands) {
+                        const hand2 = results.multiHandLandmarks[1];
+                        const pinchDist2 = calculateDistance(hand2[4], hand2[8]);
+                        const isPinched2 = pinchDist2 < 0.05;
 
-                        window.Scene3D.currentMesh.rotation.y += dx * 0.005;
-                        window.Scene3D.currentMesh.rotation.x += dy * 0.005;
-                        if (window.Scene3D.currentMesh.userData && window.Scene3D.currentMesh.userData.strokeData) {
-                            const sd = window.Scene3D.currentMesh.userData.strokeData;
-                            sd.rotationX = window.Scene3D.currentMesh.rotation.x;
-                            sd.rotationY = window.Scene3D.currentMesh.rotation.y;
-                            sd.rotationZ = window.Scene3D.currentMesh.rotation.z;
-                            if (typeof window.sendNetworkData === 'function') {
-                                window.sendNetworkData({ type: 'sekil_guncelle', stroke: sd });
+                        // İki elin işaret parmakları arasındaki mesafe
+                        const handsDistance = calculateDistance(hand1[8], hand2[8]);
+
+                        if (isPinched1 && isPinched2) {
+                            // 1. İKİ EL KAPALI: BÜYÜTME/KÜÇÜLTME
+                            laserCursor.style.backgroundColor = '#ff00ff'; // Mor (Büyütme modu)
+                            if (startScaleDistance === 0) {
+                                startScaleDistance = handsDistance;
+                                startScale = mesh.scale.x;
+                            } else {
+                                const scaleFactor = handsDistance / startScaleDistance;
+                                let newScale = startScale * scaleFactor;
+                                newScale = Math.max(0.2, Math.min(newScale, 10)); 
+                                mesh.scale.setScalar(newScale);
+                                
+                                if (mesh.userData && mesh.userData.strokeData) {
+                                    mesh.userData.strokeData.meshScale = newScale;
+                                    if (typeof window.sendNetworkData === 'function') {
+                                        window.sendNetworkData({ type: 'sekil_guncelle', stroke: mesh.userData.strokeData });
+                                    }
+                                }
                             }
+                            startOpenDistance = 0; 
+                        } 
+                        else if (!isPinched1 && !isPinched2) {
+                            // 2. İKİ EL AÇIK: AÇINIM (Yırtma)
+                            laserCursor.style.backgroundColor = '#ffff00'; // Sarı (Açınım modu)
+                            if (startOpenDistance === 0) {
+                                startOpenDistance = handsDistance;
+                                startOpenRatio = mesh.userData.strokeData?.openRatio || 0;
+                            } else {
+                                const distDiff = handsDistance - startOpenDistance;
+                                let ratioChange = distDiff * 2; 
+                                let newRatio = Math.max(0, Math.min(1, startOpenRatio + ratioChange));
+                                
+                                const sInput = document.getElementById('shape-slider');
+                                if(sInput) sInput.value = newRatio * 100;
+                                
+                                if (mesh.userData.isCustomCone && window.CustomConeEngine) {
+                                    window.CustomConeEngine.update(mesh, newRatio);
+                                } else if (window.Foldable3D) {
+                                    window.Foldable3D.updateUnfold(mesh, newRatio);
+                                }
+                                
+                                if (mesh.userData && mesh.userData.strokeData) {
+                                    mesh.userData.strokeData.openRatio = newRatio;
+                                    if (typeof window.sendNetworkData === 'function') {
+                                        window.sendNetworkData({ type: 'sekil_guncelle', stroke: mesh.userData.strokeData });
+                                    }
+                                }
+                            }
+                            startScaleDistance = 0; 
+                        }
+                        startX = 0; 
+                    } 
+                    else {
+                        // SADECE TEK EL VAR
+                        startScaleDistance = 0;
+                        startOpenDistance = 0;
+
+                        if (isPinched1) {
+                            // 3. TEK EL KAPALI: DÖNDÜRME
+                            laserCursor.style.backgroundColor = '#00ff00'; // Yeşil (Tutuyor)
+                            if (startX !== 0 && startY !== 0) {
+                                const dx = px1 - startX;
+                                const dy = py1 - startY;
+
+                                mesh.rotation.y += dx * 0.005;
+                                mesh.rotation.x += dy * 0.005;
+
+                                if (mesh.userData && mesh.userData.strokeData) {
+                                    const sd = mesh.userData.strokeData;
+                                    sd.rotationX = mesh.rotation.x;
+                                    sd.rotationY = mesh.rotation.y;
+                                    sd.rotationZ = mesh.rotation.z;
+                                    if (typeof window.sendNetworkData === 'function') {
+                                        window.sendNetworkData({ type: 'sekil_guncelle', stroke: sd });
+                                    }
+                                }
+                            }
+                            startX = px1;
+                            startY = py1;
+                        } else {
+                            // 4. TEK EL AÇIK: BOŞTA GEZİNME (Lazer)
+                            laserCursor.style.backgroundColor = '#00ffff'; // Mavi (Serbest)
+                            startX = 0;
+                            startY = 0;
                         }
                     }
-                    startX = px;
-                    startY = py;
                 }
             } else {
-                startX = 0;
-                startY = 0;
+                startX = 0; startY = 0;
+                startScaleDistance = 0; startOpenDistance = 0;
+                laserCursor.style.display = 'none';
             }
         });
 
@@ -8167,33 +8293,18 @@ tonyBtn.onclick = async () => {
 
         camera.start();
 
-        tonyBtn.innerHTML = 'Sihirli El';
+        tonyBtn.innerHTML = '🟢 Sihirli El';
         tonyBtn.style.borderColor = '#00ff00';
-        tonyBtn.style.boxShadow = '0 0 20px rgba(0,255,0,0.8)';
+        tonyBtn.style.boxShadow = '0 0 20px rgba(0,255,255,0.8)';
         tonyBtn.style.color = '#00ff00';
         tonyActive = true;
 
     } catch (e) {
         console.error('Tony Stark Modu Hatası:', e);
-        tonyBtn.innerHTML = '❌ Hata Oluştu';
+        tonyBtn.innerHTML = '❌ Hata';
         tonyBtn.style.borderColor = '#ff0000';
         tonyBtn.style.boxShadow = '0 0 10px rgba(255,0,0,0.5)';
         tonyBtn.style.color = '#ff0000';
     }
 };
-
-// --- TONY STARK BUTTON LAYOUT FIX ---
-tonyBtn.className = 'tool-button';
-tonyBtn.style.position = 'static';
-tonyBtn.style.transform = 'none';
-tonyBtn.style.width = '100%';
-tonyBtn.style.marginTop = '10px';
-tonyBtn.style.padding = '10px 0';
-tonyBtn.style.fontSize = '12px';
-tonyBtn.style.borderRadius = '10px';
-tonyBtn.innerHTML = 'Sihirli El';
-
-const oyunlarBtn = document.getElementById('btn-oyunlar');
-if (oyunlarBtn && oyunlarBtn.parentNode) {
-    oyunlarBtn.parentNode.appendChild(tonyBtn);
-}
+// ==========================================
