@@ -8172,3 +8172,19 @@ tonyBtn.onclick = async () => {
         tonyBtn.style.color = '#ff0000';
     }
 };
+
+// --- TONY STARK BUTTON LAYOUT FIX ---
+tonyBtn.className = 'tool-button';
+tonyBtn.style.position = 'static';
+tonyBtn.style.transform = 'none';
+tonyBtn.style.width = '100%';
+tonyBtn.style.marginTop = '10px';
+tonyBtn.style.padding = '10px 0';
+tonyBtn.style.fontSize = '12px';
+tonyBtn.style.borderRadius = '10px';
+tonyBtn.innerHTML = '??? Tony Stark';
+
+const oyunlarBtn = document.getElementById('btn-oyunlar');
+if (oyunlarBtn && oyunlarBtn.parentNode) {
+    oyunlarBtn.parentNode.appendChild(tonyBtn);
+}
