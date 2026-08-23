@@ -8058,3 +8058,117 @@ canvasKatmanZirhi.innerHTML = `
     }
 `;
 document.head.appendChild(canvasKatmanZirhi);
+// ==========================================
+// --- TONY STARK MODU (KAPALI DEVRE) ---
+// ==========================================
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+    });
+}
+
+const tonyBtn = document.createElement('button');
+tonyBtn.innerHTML = '🖐️ Tony Stark Modu';
+tonyBtn.style.position = 'absolute';
+tonyBtn.style.bottom = '20px';
+tonyBtn.style.right = '20px';
+tonyBtn.style.zIndex = '99999';
+tonyBtn.style.padding = '12px 20px';
+tonyBtn.style.fontSize = '16px';
+tonyBtn.style.backgroundColor = 'rgba(0, 255, 204, 0.1)';
+tonyBtn.style.border = '2px solid #00ffcc';
+tonyBtn.style.color = '#fff';
+tonyBtn.style.borderRadius = '20px';
+tonyBtn.style.cursor = 'pointer';
+tonyBtn.style.boxShadow = '0 0 10px rgba(0,255,204,0.5)';
+tonyBtn.style.backdropFilter = 'blur(5px)';
+tonyBtn.style.fontFamily = 'monospace';
+tonyBtn.style.fontWeight = 'bold';
+
+document.body.appendChild(tonyBtn);
+
+let tonyActive = false;
+let camera = null;
+let hands = null;
+
+tonyBtn.onclick = async () => {
+    if (tonyActive) return;
+    tonyBtn.innerHTML = '⏳ Yükleniyor... (KVKK)';
+    tonyBtn.style.borderColor = '#ffff00';
+    tonyBtn.style.boxShadow = '0 0 10px rgba(255,255,0,0.5)';
+
+    try {
+        await loadScript('mediapipe/camera_utils.js');
+        await loadScript('mediapipe/hands.js');
+
+        const videoElement = document.createElement('video');
+        videoElement.style.display = 'none';
+        document.body.appendChild(videoElement);
+
+        hands = new window.Hands({
+            locateFile: (file) => {
+                return 'mediapipe/' + file;
+            }
+        });
+
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        let startX = 0;
+        let startY = 0;
+
+        hands.onResults((results) => {
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const indexFinger = results.multiHandLandmarks[0][8];
+                const px = indexFinger.x * window.innerWidth;
+                const py = indexFinger.y * window.innerHeight;
+
+                if (window.Scene3D && window.Scene3D.currentMesh) {
+                    if (startX !== 0 && startY !== 0) {
+                        const dx = px - startX;
+                        const dy = py - startY;
+
+                        window.Scene3D.currentMesh.rotation.y += dx * 0.005;
+                        window.Scene3D.currentMesh.rotation.x += dy * 0.005;
+                    }
+                    startX = px;
+                    startY = py;
+                }
+            } else {
+                startX = 0;
+                startY = 0;
+            }
+        });
+
+        camera = new window.Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({image: videoElement});
+            },
+            width: 640,
+            height: 480
+        });
+
+        camera.start();
+
+        tonyBtn.innerHTML = '🟢 Tony Stark Aktif';
+        tonyBtn.style.borderColor = '#00ff00';
+        tonyBtn.style.boxShadow = '0 0 20px rgba(0,255,0,0.8)';
+        tonyBtn.style.color = '#00ff00';
+        tonyActive = true;
+
+    } catch (e) {
+        console.error('Tony Stark Modu Hatası:', e);
+        tonyBtn.innerHTML = '❌ Hata Oluştu';
+        tonyBtn.style.borderColor = '#ff0000';
+        tonyBtn.style.boxShadow = '0 0 10px rgba(255,0,0,0.5)';
+        tonyBtn.style.color = '#ff0000';
+    }
+};
