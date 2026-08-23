@@ -8105,7 +8105,7 @@ tonyBtn.onclick = async () => {
         await loadScript('mediapipe/camera_utils.js');
         await loadScript('mediapipe/hands.js');
 
-        const videoElement = document.createElement('video');
+        const videoElement = document.createElement('video'); videoElement.id = 'tony-video-elem';
         videoElement.style.display = 'none';
         document.body.appendChild(videoElement);
 
