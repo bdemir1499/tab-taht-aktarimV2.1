@@ -8147,11 +8147,11 @@ tonyBtn.onclick = async () => {
         videoElement.setAttribute('autoplay', '');
         videoElement.setAttribute('muted', '');
         videoElement.id = 'tony-video-elem';
-        videoElement.style.position = 'absolute'; videoElement.style.opacity = '0'; videoElement.style.width = '10px'; videoElement.style.height = '10px'; videoElement.style.zIndex = '-1';
+        videoElement.style.position = 'fixed'; videoElement.style.opacity = '0.01'; videoElement.style.width = '100%'; videoElement.style.height = '100%'; videoElement.style.zIndex = '-9999'; videoElement.style.top = '0'; videoElement.style.left = '0'; videoElement.style.pointerEvents = 'none'; videoElement.muted = true;
         document.body.appendChild(videoElement);
 
         hands = new window.Hands({
-            locateFile: (file) => 'mediapipe/' + file
+            locateFile: (file) => window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'mediapipe/' + file
         });
 
         hands.setOptions({
