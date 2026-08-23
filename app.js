@@ -8143,6 +8143,9 @@ tonyBtn.onclick = async () => {
         await loadScript('mediapipe/hands.js');
 
         const videoElement = document.createElement('video');
+        videoElement.setAttribute('playsinline', '');
+        videoElement.setAttribute('autoplay', '');
+        videoElement.setAttribute('muted', '');
         videoElement.id = 'tony-video-elem';
         videoElement.style.display = 'none';
         document.body.appendChild(videoElement);
