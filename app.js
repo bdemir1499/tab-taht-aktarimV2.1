@@ -8074,8 +8074,8 @@ function loadScript(src) {
 const tonyBtn = document.createElement('button');
 tonyBtn.innerHTML = '🖐️ Tony Stark Modu';
 tonyBtn.style.position = 'absolute';
-tonyBtn.style.bottom = '20px';
-tonyBtn.style.right = '20px';
+tonyBtn.style.top = '20px';
+tonyBtn.style.left = '50%'; tonyBtn.style.transform = 'translateX(-50%)';
 tonyBtn.style.zIndex = '99999';
 tonyBtn.style.padding = '12px 20px';
 tonyBtn.style.fontSize = '16px';
