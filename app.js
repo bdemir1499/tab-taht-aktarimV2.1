@@ -8147,7 +8147,7 @@ tonyBtn.onclick = async () => {
         videoElement.setAttribute('autoplay', '');
         videoElement.setAttribute('muted', '');
         videoElement.id = 'tony-video-elem';
-        videoElement.style.display = 'none';
+        videoElement.style.position = 'absolute'; videoElement.style.opacity = '0'; videoElement.style.width = '10px'; videoElement.style.height = '10px'; videoElement.style.zIndex = '-1';
         document.body.appendChild(videoElement);
 
         hands = new window.Hands({
@@ -8291,7 +8291,8 @@ tonyBtn.onclick = async () => {
                 await hands.send({image: videoElement});
             },
             width: 640,
-            height: 480
+            height: 480,
+            facingMode: 'user'
         });
 
         camera.start();
