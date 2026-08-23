@@ -8151,7 +8151,17 @@ tonyBtn.onclick = async () => {
         document.body.appendChild(videoElement);
 
         hands = new window.Hands({
-            locateFile: (file) => window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'mediapipe/' + file
+            locateFile: (file) => {
+            let baseUrl = window.location.href.split('?')[0].split('#')[0];
+            if (!baseUrl.endsWith('/')) {
+                if (baseUrl.endsWith('.html')) {
+                    baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+                } else {
+                    baseUrl += '/';
+                }
+            }
+            return baseUrl + 'mediapipe/' + file;
+        }
         });
 
         hands.setOptions({
