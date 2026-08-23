@@ -8138,6 +8138,15 @@ tonyBtn.onclick = async () => {
 
                         window.Scene3D.currentMesh.rotation.y += dx * 0.005;
                         window.Scene3D.currentMesh.rotation.x += dy * 0.005;
+                        if (window.Scene3D.currentMesh.userData && window.Scene3D.currentMesh.userData.strokeData) {
+                            const sd = window.Scene3D.currentMesh.userData.strokeData;
+                            sd.rotationX = window.Scene3D.currentMesh.rotation.x;
+                            sd.rotationY = window.Scene3D.currentMesh.rotation.y;
+                            sd.rotationZ = window.Scene3D.currentMesh.rotation.z;
+                            if (typeof window.sendNetworkData === 'function') {
+                                window.sendNetworkData({ type: 'sekil_guncelle', stroke: sd });
+                            }
+                        }
                     }
                     startX = px;
                     startY = py;
