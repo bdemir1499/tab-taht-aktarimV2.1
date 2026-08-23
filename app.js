@@ -8072,7 +8072,7 @@ function loadScript(src) {
 }
 
 const tonyBtn = document.createElement('button');
-tonyBtn.innerHTML = '🖐️ Tony Stark Modu';
+tonyBtn.innerHTML = 'Sihirli El';
 tonyBtn.style.position = 'absolute';
 tonyBtn.style.top = '20px';
 tonyBtn.style.left = '50%'; tonyBtn.style.transform = 'translateX(-50%)';
@@ -8158,7 +8158,7 @@ tonyBtn.onclick = async () => {
 
         camera.start();
 
-        tonyBtn.innerHTML = '🟢 Tony Stark Aktif';
+        tonyBtn.innerHTML = 'Sihirli El';
         tonyBtn.style.borderColor = '#00ff00';
         tonyBtn.style.boxShadow = '0 0 20px rgba(0,255,0,0.8)';
         tonyBtn.style.color = '#00ff00';
@@ -8182,7 +8182,7 @@ tonyBtn.style.marginTop = '10px';
 tonyBtn.style.padding = '10px 0';
 tonyBtn.style.fontSize = '12px';
 tonyBtn.style.borderRadius = '10px';
-tonyBtn.innerHTML = '??? Tony Stark';
+tonyBtn.innerHTML = 'Sihirli El';
 
 const oyunlarBtn = document.getElementById('btn-oyunlar');
 if (oyunlarBtn && oyunlarBtn.parentNode) {
