@@ -8105,6 +8105,8 @@ laserCursor.style.borderRadius = '50%';
 laserCursor.style.backgroundColor = '#00ffff'; // Iron Man Blue
 laserCursor.style.boxShadow = '0 0 15px 5px rgba(0, 255, 255, 0.8)';
 laserCursor.style.pointerEvents = 'none';
+laserCursor.style.transition = 'left 0.1s ease-out, top 0.1s ease-out, background-color 0.2s';
+laserCursor.style.willChange = 'left, top';
 laserCursor.style.zIndex = '999999';
 laserCursor.style.display = 'none';
 laserCursor.style.transform = 'translate(-50%, -50%)';
@@ -8148,7 +8150,7 @@ function calculateDistance(p1, p2) {
             videoElement.setAttribute('muted', '');
             videoElement.id = 'tony-video-elem';
             videoElement.style.position = 'fixed'; 
-            videoElement.style.opacity = '0.15'; 
+            videoElement.style.opacity = '0.001'; videoElement.setAttribute('webkit-playsinline', 'true'); 
             videoElement.style.transform = 'scaleX(-1)';
             videoElement.style.width = '100%'; 
             videoElement.style.height = '100%'; 
@@ -8202,7 +8204,7 @@ function calculateDistance(p1, p2) {
                                 const isPinched2 = pinchDist2 < 0.12;
                                 const handsDistance = calculateDistance(hand1[8], hand2[8]);
 
-                                if (isPinched1 && isPinched2) {
+                                if (!isPinched1 && !isPinched2) {
                                     laserCursor.style.backgroundColor = '#ff00ff'; 
                                     if (startScaleDistance === 0) {
                                         startScaleDistance = handsDistance;
@@ -8222,7 +8224,7 @@ function calculateDistance(p1, p2) {
                                     }
                                     startOpenDistance = 0; 
                                 } 
-                                else if (!isPinched1 && !isPinched2) {
+                                else if (isPinched1 && isPinched2) {
                                     laserCursor.style.backgroundColor = '#ffff00'; 
                                     if (startOpenDistance === 0) {
                                         startOpenDistance = handsDistance;
