@@ -8181,7 +8181,7 @@ tonyBtn.onclick = async () => {
                 const hand1 = results.multiHandLandmarks[0];
                 
                 // Lazer İmleci Çiz
-                const px1 = hand1[8].x * window.innerWidth;
+                const px1 = (1 - hand1[8].x) * window.innerWidth;
                 const py1 = hand1[8].y * window.innerHeight;
                 laserCursor.style.display = 'block';
                 laserCursor.style.left = px1 + 'px';
@@ -8189,7 +8189,7 @@ tonyBtn.onclick = async () => {
                 
                 // Kavrama Kontrolü (Başparmak [4] ve İşaret Parmağı [8])
                 const pinchDist1 = calculateDistance(hand1[4], hand1[8]);
-                const isPinched1 = pinchDist1 < 0.05; // 0.05 ekrana göre çok yakın (tutma)
+                const isPinched1 = pinchDist1 < 0.12; // 0.05 ekrana göre çok yakın (tutma)
 
                 if (window.Scene3D && window.Scene3D.currentMesh) {
                     const mesh = window.Scene3D.currentMesh;
@@ -8197,7 +8197,7 @@ tonyBtn.onclick = async () => {
                     if (isTwoHands) {
                         const hand2 = results.multiHandLandmarks[1];
                         const pinchDist2 = calculateDistance(hand2[4], hand2[8]);
-                        const isPinched2 = pinchDist2 < 0.05;
+                        const isPinched2 = pinchDist2 < 0.12;
 
                         // İki elin işaret parmakları arasındaki mesafe
                         const handsDistance = calculateDistance(hand1[8], hand2[8]);
