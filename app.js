@@ -8147,26 +8147,16 @@ tonyBtn.onclick = async () => {
         videoElement.setAttribute('autoplay', '');
         videoElement.setAttribute('muted', '');
         videoElement.id = 'tony-video-elem';
-        videoElement.style.position = 'fixed'; videoElement.style.opacity = '0.01'; videoElement.style.width = '100%'; videoElement.style.height = '100%'; videoElement.style.zIndex = '-9999'; videoElement.style.top = '0'; videoElement.style.left = '0'; videoElement.style.pointerEvents = 'none'; videoElement.muted = true;
+        videoElement.style.position = 'fixed'; videoElement.style.opacity = '0.15'; videoElement.style.transform = 'scaleX(-1)'; videoElement.style.width = '100%'; videoElement.style.height = '100%'; videoElement.style.zIndex = '-9999'; videoElement.style.top = '0'; videoElement.style.left = '0'; videoElement.style.pointerEvents = 'none'; videoElement.muted = true;
         document.body.appendChild(videoElement);
 
         hands = new window.Hands({
-            locateFile: (file) => {
-            let baseUrl = window.location.href.split('?')[0].split('#')[0];
-            if (!baseUrl.endsWith('/')) {
-                if (baseUrl.endsWith('.html')) {
-                    baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
-                } else {
-                    baseUrl += '/';
-                }
-            }
-            return baseUrl + 'mediapipe/' + file;
-        }
+            locateFile: (file) => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + file
         });
 
         hands.setOptions({
             maxNumHands: 2, // İKİ EL DESTEĞİ
-            modelComplexity: 1,
+            modelComplexity: 0,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
         });
@@ -8176,6 +8166,10 @@ tonyBtn.onclick = async () => {
         let startOpenDistance = 0, startOpenRatio = 0;
 
         hands.onResults((results) => {
+            tonyBtn.innerHTML = 'AI Aktif';
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                tonyBtn.innerHTML = 'El Grd!';
+
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const isTwoHands = results.multiHandLandmarks.length === 2;
                 const hand1 = results.multiHandLandmarks[0];
