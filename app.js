@@ -8181,7 +8181,7 @@ tonyBtn.onclick = async () => {
                 const hand1 = results.multiHandLandmarks[0];
                 
                 // Lazer İmleci Çiz
-                const px1 = (1 - hand1[8].x) * window.innerWidth;
+                const px1 = hand1[8].x * window.innerWidth;
                 const py1 = hand1[8].y * window.innerHeight;
                 laserCursor.style.display = 'block';
                 laserCursor.style.left = px1 + 'px';
@@ -8191,8 +8191,12 @@ tonyBtn.onclick = async () => {
                 const pinchDist1 = calculateDistance(hand1[4], hand1[8]);
                 const isPinched1 = pinchDist1 < 0.12; // 0.05 ekrana göre çok yakın (tutma)
 
-                if (window.Scene3D && window.Scene3D.currentMesh) {
-                    const mesh = window.Scene3D.currentMesh;
+                if (window.Scene3D) {
+                    let mesh = window.Scene3D.currentMesh;
+                    if (!mesh && window.Scene3D.scene) {
+                        mesh = window.Scene3D.scene.children.find(m => m.userData && m.userData.strokeData);
+                    }
+                    if (mesh) {
                     
                     if (isTwoHands) {
                         const hand2 = results.multiHandLandmarks[1];
@@ -8266,7 +8270,7 @@ tonyBtn.onclick = async () => {
                                 const dx = px1 - startX;
                                 const dy = py1 - startY;
 
-                                mesh.rotation.y += dx * 0.005;
+                                mesh.rotation.y += dx * -0.005;
                                 mesh.rotation.x += dy * 0.005;
 
                                 if (mesh.userData && mesh.userData.strokeData) {
@@ -8288,6 +8292,7 @@ tonyBtn.onclick = async () => {
                             startY = 0;
                         }
                     }
+                    } // close if (mesh)
                 }
             } else {
                 startX = 0; startY = 0;
