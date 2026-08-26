@@ -8251,7 +8251,8 @@ function calculateDistance(p1, p2) {
                     laserCursor.style.top = py1 + 'px';
                     
                     const pinchDist1 = calculateDistance(hand1[4], hand1[8]);
-                    const isPinched1 = pinchDist1 < 0.12; 
+                    const isFist1 = calculateDistance(hand1[8], hand1[5]) < 0.12 && calculateDistance(hand1[12], hand1[9]) < 0.12 && calculateDistance(hand1[16], hand1[13]) < 0.12 && calculateDistance(hand1[20], hand1[17]) < 0.12;
+                    const isPinched1 = !isFist1 && (pinchDist1 < 0.07); 
 
                     if (window.Scene3D) {
                         let mesh = window.Scene3D.currentMesh;
@@ -8262,7 +8263,8 @@ function calculateDistance(p1, p2) {
                             if (isTwoHands) {
                                 const hand2 = results.multiHandLandmarks[1];
                                 const pinchDist2 = calculateDistance(hand2[4], hand2[8]);
-                                const isPinched2 = pinchDist2 < 0.12;
+                                const isFist2 = calculateDistance(hand2[8], hand2[5]) < 0.12 && calculateDistance(hand2[12], hand2[9]) < 0.12 && calculateDistance(hand2[16], hand2[13]) < 0.12 && calculateDistance(hand2[20], hand2[17]) < 0.12;
+                                const isPinched2 = !isFist2 && (pinchDist2 < 0.07);
                                 const handsDistance = calculateDistance(hand1[8], hand2[8]);
 
                                 // Hata onleme: Iki el birbirinden en az %15 uzak olmali (yanlis algilamalari onler)
@@ -8323,13 +8325,7 @@ function calculateDistance(p1, p2) {
                                             
                                             if (mesh.userData && mesh.userData.strokeData) {
                                                 mesh.userData.strokeData.openRatio = newRatio;
-                                                const now = Date.now();
-                                                if (now - window.lastAISendTime > 40) {
-                                                    if (typeof window.sendNetworkData === "function") {
-                                                        window.sendNetworkData({ type: "sekil_guncelle", stroke: mesh.userData.strokeData });
-                                                    }
-                                                    window.lastAISendTime = now;
-                                                }
+                                                if (typeof window.sendNetworkData === "function") { window.sendNetworkData({ type: "sekil_guncelle", stroke: mesh.userData.strokeData }); }
                                             }
                                         }
                                         startScaleDistance = 0; 
@@ -8345,7 +8341,7 @@ function calculateDistance(p1, p2) {
                                 startScaleDistance = 0;
                                 startOpenDistance = 0;
 
-                                const isFist = calculateDistance(hand1[8], hand1[5]) < 0.08 && calculateDistance(hand1[12], hand1[9]) < 0.08;
+                                const isFist = isFist1;
 
                                 if (isFist) {
                                     laserCursor.style.backgroundColor = '#ff0000'; 
@@ -8378,13 +8374,7 @@ function calculateDistance(p1, p2) {
                                             if (mesh.userData && mesh.userData.strokeData) {
                                                 mesh.userData.strokeData.x = (vec.x * w) + w;
                                                 mesh.userData.strokeData.y = -(vec.y * h) + h;
-                                                const now = Date.now();
-                                                if (now - window.lastAISendTime > 40) {
-                                                    if (typeof window.sendNetworkData === 'function') {
-                                                        window.sendNetworkData({ type: 'sekil_guncelle', stroke: mesh.userData.strokeData });
-                                                    }
-                                                    window.lastAISendTime = now;
-                                                }
+                                                if (typeof window.sendNetworkData === "function") { window.sendNetworkData({ type: "sekil_guncelle", stroke: mesh.userData.strokeData }); }
                                             }
                                         }
                                     }
@@ -8413,13 +8403,7 @@ function calculateDistance(p1, p2) {
                                             sd.rotationX = euler.x;
                                             sd.rotationY = euler.y;
                                             sd.rotationZ = euler.z;
-                                            const now = Date.now();
-                                            if (now - window.lastAISendTime > 40) {
-                                                if (typeof window.sendNetworkData === 'function') {
-                                                    window.sendNetworkData({ type: 'sekil_guncelle', stroke: sd });
-                                                }
-                                                window.lastAISendTime = now;
-                                            }
+                                            if (typeof window.sendNetworkData === "function") { window.sendNetworkData({ type: "sekil_guncelle", stroke: sd }); }
                                         }
                                     }
                                     startX = px1;
