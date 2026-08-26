@@ -8161,7 +8161,13 @@ function calculateDistance(p1, p2) {
             if (camera) { camera.stop(); camera = null; }
             if (hands) { hands.close(); hands = null; }
             const vid = document.getElementById('tony-video-elem');
-            if (vid) { vid.remove(); }
+            if (vid) {
+                // Kamera donanim isigini ve kaydini TAMAMEN kapatmak icin MediaStream tracklerini durdurmaliyiz!
+                if (vid.srcObject) {
+                    vid.srcObject.getTracks().forEach(track => track.stop());
+                }
+                vid.remove();
+            }
             tonyActive = false;
             laserCursor.style.display = 'none';
             tonyBtn.innerHTML = '🤖 Sihirli El';
