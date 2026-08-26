@@ -7422,10 +7422,10 @@ window.Scene3D = {
                     }
                     
                     if (mesh.userData.targetQuaternion) {
-                        mesh.quaternion.slerp(mesh.userData.targetQuaternion, 0.15);
+                        mesh.quaternion.slerp(mesh.userData.targetQuaternion, 0.40); // 0.15'den 0.40'a cikarildi (Aninda tepki)
                     }
                     if (mesh.userData.targetPosition) {
-                        mesh.position.lerp(mesh.userData.targetPosition, 0.2);
+                        mesh.position.lerp(mesh.userData.targetPosition, 0.45); // 0.2'den 0.45'e cikarildi (Aninda yapisma)
                     }
                 }
             });
@@ -8393,8 +8393,8 @@ function calculateDistance(p1, p2) {
                                         }
                                         const dummy = new THREE.Object3D();
                                         dummy.quaternion.copy(mesh.userData.targetQuaternion);
-                                        dummy.rotateOnWorldAxis(camUp, dx * 0.005);
-                                        dummy.rotateOnWorldAxis(camRight, dy * -0.005);
+                                        dummy.rotateOnWorldAxis(camUp, dx * 0.008); // 0.005'ten 0.008'e cikarildi (Daha hizli donus)
+                                        dummy.rotateOnWorldAxis(camRight, dy * -0.008);
                                         mesh.userData.targetQuaternion.copy(dummy.quaternion);
 
                                         if (mesh.userData && mesh.userData.strokeData) {
