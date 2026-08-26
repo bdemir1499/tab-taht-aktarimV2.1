@@ -7543,8 +7543,8 @@ window.Scene3D = {
             }
             const dummy = new THREE.Object3D();
             dummy.quaternion.copy(this.currentMesh.userData.targetQuaternion);
-            dummy.rotateOnWorldAxis(camRight, (y - this.lastMousePos.y) * -0.01);
-            dummy.rotateOnWorldAxis(camUp, (x - this.lastMousePos.x) * -0.01);
+            dummy.rotateOnWorldAxis(camRight, (y - this.lastMousePos.y) * 0.01);
+            dummy.rotateOnWorldAxis(camUp, (x - this.lastMousePos.x) * 0.01);
             this.currentMesh.userData.targetQuaternion.copy(dummy.quaternion);
             
             this.lastMousePos = { x, y };
@@ -8328,8 +8328,8 @@ function calculateDistance(p1, p2) {
                                         }
                                         const dummy = new THREE.Object3D();
                                         dummy.quaternion.copy(mesh.userData.targetQuaternion);
-                                        dummy.rotateOnWorldAxis(camUp, dx * -0.005);
-                                        dummy.rotateOnWorldAxis(camRight, dummy.userData.temp ? 0 : dy * 0.005);
+                                        dummy.rotateOnWorldAxis(camUp, dx * 0.005);
+                                        dummy.rotateOnWorldAxis(camRight, dy * -0.005);
                                         mesh.userData.targetQuaternion.copy(dummy.quaternion);
 
                                         if (mesh.userData && mesh.userData.strokeData) {
