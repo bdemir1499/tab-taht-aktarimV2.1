@@ -290,10 +290,23 @@ window.Foldable3D = {
 
         const outerGroup = new THREE.Group();
         outerGroup.userData = group.userData;
-        outerGroup.userData.innerGroup = group; // İç grubu sakla ki rotasyonu nötrleyebilelim
-        if (type.startsWith('prism_')) {
+        outerGroup.userData.innerGroup = group; 
+        if (type.startsWith("prism_")) {
             outerGroup.userData.shiftX = group.userData.shiftX;
         }
+
+        // ==========================================
+        // DYNAMIC PIVOT CENTERING (Orbit / Savrulma Fix)
+        // ==========================================
+        const box = new THREE.Box3().setFromObject(group);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        
+        group.userData.foldedCenter = center.clone();
+        
+        group.position.set(-center.x, -center.y, -center.z);
+        // ==========================================
+
         outerGroup.add(group);
 
         return outerGroup;
@@ -343,7 +356,15 @@ window.Foldable3D = {
             inner.quaternion.copy(qClosed).slerp(qOpenTarget, openRatio);
 
             // Prizmaların açınımı yana doğru uzadığı için, açıldıkça şekli ortala
-            if (group.userData.shiftX) {
+            // Pivot merkezleme (Savrulma onleyici)
+            if (group.userData.foldedCenter) {
+                const fx = -group.userData.foldedCenter.x;
+                const tx = group.userData.shiftX !== undefined ? group.userData.shiftX : fx;
+                
+                inner.position.x = fx + (tx - fx) * openRatio;
+                inner.position.y = -group.userData.foldedCenter.y;
+                inner.position.z = -group.userData.foldedCenter.z;
+            } else if (group.userData.shiftX) {
                 inner.position.x = group.userData.shiftX * openRatio;
             }
         }
