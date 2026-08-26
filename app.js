@@ -6553,17 +6553,22 @@ if (!data || !data.type) return;
                 }
 
                         // Rotasyon ayarlarını koru
+                        // Rotasyon ayarlarini koru
                         if (data.stroke.rotationX !== undefined) sceneMesh.rotation.x = data.stroke.rotationX;
                         if (data.stroke.rotationY !== undefined) sceneMesh.rotation.y = data.stroke.rotationY;
                         if (data.stroke.rotationZ !== undefined) sceneMesh.rotation.z = data.stroke.rotationZ;
 
-                        // Sürgü açınım bilgisini senkronize et
+                        // Boyut (Scale) bilgisini aninda WebGL motoruna yansit (Gecikmesiz)
+                        if (data.stroke.meshScale !== undefined) {
+                            sceneMesh.scale.setScalar(data.stroke.meshScale);
+                        }
+
+                        // Surgu acinim bilgisini senkronize et
                         if (data.stroke.openRatio !== undefined) {
                             hedef.openRatio = data.stroke.openRatio;
                             if (sceneMesh.userData && sceneMesh.userData.strokeData) {
                                 sceneMesh.userData.strokeData.openRatio = data.stroke.openRatio;
                             }
-                            // 🚨 KONİ ÇÖZÜMÜ: Ağ üzerinden gelen sürgü değerini uygula
                             if (sceneMesh.userData.isCustomCone && window.CustomConeEngine) {
                                 window.CustomConeEngine.update(sceneMesh, data.stroke.openRatio);
                             } else if (window.Foldable3D) {
@@ -6572,6 +6577,17 @@ if (!data || !data.type) return;
                         }
 
                         if (window.Scene3D.currentMesh === sceneMesh) window.Scene3D.updateHandlePositions();
+                    }
+                    
+                    // ==========================================
+                    // HIZ OPTIMIZASYONU (GECIKME KALDIRICI)
+                    // ==========================================
+                    // Eger yansitilan sekil sadece bir 3D model ise (ve uzerinde 2D yazi/etiket yoksa)
+                    // koca 2D sayfa cizim motorunu (redrawAllStrokes) saniyede 60 kez calistirmaya ASLA gerek yoktur!
+                    // WebGL motoru zaten (requestAnimationFrame) ile aninda kendi goruntusunu gunceller.
+                    // Bu return komutu sayfa kilitlenmesini ve agdaki ping gecikmelerini SIFIRA indirir.
+                    if (!hedef.showEdgeLabels && !hedef.showAngleLabels && !hedef.showCircleInfo) {
+                        return; 
                     }
                 }
 
