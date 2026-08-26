@@ -6554,9 +6554,14 @@ if (!data || !data.type) return;
 
                         // Rotasyon ayarlarını koru
                         // Rotasyon ayarlarini koru
-                        if (data.stroke.rotationX !== undefined) sceneMesh.rotation.x = data.stroke.rotationX;
-                        if (data.stroke.rotationY !== undefined) sceneMesh.rotation.y = data.stroke.rotationY;
-                        if (data.stroke.rotationZ !== undefined) sceneMesh.rotation.z = data.stroke.rotationZ;
+                                                // Rotasyon ayarlarini koru (SLERP Hedefi)
+                        if (data.stroke.rotationX !== undefined) {
+                            if (!sceneMesh.userData.targetQuaternion) {
+                                sceneMesh.userData.targetQuaternion = sceneMesh.quaternion.clone();
+                            }
+                            const targetEuler = new THREE.Euler(data.stroke.rotationX, data.stroke.rotationY, data.stroke.rotationZ, 'XYZ');
+                            sceneMesh.userData.targetQuaternion.setFromEuler(targetEuler);
+                        }
 
                         // Boyut (Scale) bilgisini aninda WebGL motoruna yansit (Gecikmesiz)
                         if (data.stroke.meshScale !== undefined) {
@@ -7398,6 +7403,10 @@ window.Scene3D = {
                     } else if (window.Foldable3D) {
                         window.Foldable3D.updateUnfold(mesh, mesh.userData.strokeData.openRatio || 0);
                     }
+                    
+                    if (mesh.userData.targetQuaternion) {
+                        mesh.quaternion.slerp(mesh.userData.targetQuaternion, 0.15);
+                    }
                 }
             });
         }
@@ -7529,17 +7538,24 @@ window.Scene3D = {
         if (this.isRotatingHandle && this.currentMesh) {
             const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
             const camUp = new THREE.Vector3(0, 1, 0).applyQuaternion(this.camera.quaternion);
-            this.currentMesh.rotateOnWorldAxis(camRight, (y - this.lastMousePos.y) * -0.01); // ASAGI CIKIYORSA YUKARI DEGIL, ASAGI DONSUN
-            this.currentMesh.rotateOnWorldAxis(camUp, (x - this.lastMousePos.x) * -0.01);
+                        if (!this.currentMesh.userData.targetQuaternion) {
+                this.currentMesh.userData.targetQuaternion = this.currentMesh.quaternion.clone();
+            }
+            const dummy = new THREE.Object3D();
+            dummy.quaternion.copy(this.currentMesh.userData.targetQuaternion);
+            dummy.rotateOnWorldAxis(camRight, (y - this.lastMousePos.y) * -0.01);
+            dummy.rotateOnWorldAxis(camUp, (x - this.lastMousePos.x) * -0.01);
+            this.currentMesh.userData.targetQuaternion.copy(dummy.quaternion);
+            
             this.lastMousePos = { x, y };
             this.updateHandlePositions();
             
-            // Yeşil buton verisi PC'ye sorunsuz iletilir
             if (this.currentMesh.userData && this.currentMesh.userData.strokeData) {
                 const sd = this.currentMesh.userData.strokeData;
-                sd.rotationX = this.currentMesh.rotation.x;
-                sd.rotationY = this.currentMesh.rotation.y;
-                sd.rotationZ = this.currentMesh.rotation.z;
+                const euler = new THREE.Euler().setFromQuaternion(this.currentMesh.userData.targetQuaternion, 'XYZ');
+                sd.rotationX = euler.x;
+                sd.rotationY = euler.y;
+                sd.rotationZ = euler.z;
                 if (typeof window.sendNetworkData === 'function') window.sendNetworkData({ type: 'sekil_guncelle', stroke: sd });
             }
             return;
@@ -8307,14 +8323,21 @@ function calculateDistance(p1, p2) {
                                         // Gimbal Lock Fix + Trackball (Dunya Maketi) Eksen Donusumu
                                         const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(window.Scene3D.camera.quaternion);
                                         const camUp = new THREE.Vector3(0, 1, 0).applyQuaternion(window.Scene3D.camera.quaternion);
-                                        mesh.rotateOnWorldAxis(camUp, dx * -0.005);
-                                        mesh.rotateOnWorldAxis(camRight, dy * 0.005); // TERSINE CEVIRILDI (YON DUZELTME)
+                                        if (!mesh.userData.targetQuaternion) {
+                                            mesh.userData.targetQuaternion = mesh.quaternion.clone();
+                                        }
+                                        const dummy = new THREE.Object3D();
+                                        dummy.quaternion.copy(mesh.userData.targetQuaternion);
+                                        dummy.rotateOnWorldAxis(camUp, dx * -0.005);
+                                        dummy.rotateOnWorldAxis(camRight, dummy.userData.temp ? 0 : dy * 0.005);
+                                        mesh.userData.targetQuaternion.copy(dummy.quaternion);
 
                                         if (mesh.userData && mesh.userData.strokeData) {
                                             const sd = mesh.userData.strokeData;
-                                            sd.rotationX = mesh.rotation.x;
-                                            sd.rotationY = mesh.rotation.y;
-                                            sd.rotationZ = mesh.rotation.z;
+                                            const euler = new THREE.Euler().setFromQuaternion(mesh.userData.targetQuaternion, 'XYZ');
+                                            sd.rotationX = euler.x;
+                                            sd.rotationY = euler.y;
+                                            sd.rotationZ = euler.z;
                                             if (typeof window.sendNetworkData === 'function') {
                                                 window.sendNetworkData({ type: 'sekil_guncelle', stroke: sd });
                                             }
