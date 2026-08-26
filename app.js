@@ -7527,8 +7527,10 @@ window.Scene3D = {
 
     onMove: function (x, y) {
         if (this.isRotatingHandle && this.currentMesh) {
-            this.currentMesh.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), (y - this.lastMousePos.y) * 0.01);
-            this.currentMesh.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), (x - this.lastMousePos.x) * 0.01);
+            const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
+            const camUp = new THREE.Vector3(0, 1, 0).applyQuaternion(this.camera.quaternion);
+            this.currentMesh.rotateOnWorldAxis(camRight, (y - this.lastMousePos.y) * 0.01);
+            this.currentMesh.rotateOnWorldAxis(camUp, (x - this.lastMousePos.x) * 0.01);
             this.lastMousePos = { x, y };
             this.updateHandlePositions();
             
@@ -8302,9 +8304,11 @@ function calculateDistance(p1, p2) {
                                         const dx = px1 - startX;
                                         const dy = py1 - startY;
 
-                                        // Gimbal Lock Fix + Y Eksen Invert
-                                        mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), dx * -0.005);
-                                        mesh.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), dy * -0.005);
+                                        // Gimbal Lock Fix + Trackball (Dunya Maketi) Eksen Donusumu
+                                        const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(window.Scene3D.camera.quaternion);
+                                        const camUp = new THREE.Vector3(0, 1, 0).applyQuaternion(window.Scene3D.camera.quaternion);
+                                        mesh.rotateOnWorldAxis(camUp, dx * -0.005);
+                                        mesh.rotateOnWorldAxis(camRight, dy * -0.005);
 
                                         if (mesh.userData && mesh.userData.strokeData) {
                                             const sd = mesh.userData.strokeData;
