@@ -295,19 +295,22 @@ window.Foldable3D = {
             outerGroup.userData.shiftX = group.userData.shiftX;
         }
 
+        outerGroup.add(group);
+
         // ==========================================
         // DYNAMIC PIVOT CENTERING (Orbit / Savrulma Fix)
         // ==========================================
+        // HATA DUZELTME: Bounding box hesaplanmadan once seklin KAPALI (0) 
+        // formuna gecmesi gerekir! Aksi halde acik (2D) halinin merkezini alir ve SAVRULUR!
+        this.updateUnfold(outerGroup, 0);
+
         const box = new THREE.Box3().setFromObject(group);
         const center = new THREE.Vector3();
         box.getCenter(center);
         
         group.userData.foldedCenter = center.clone();
-        
         group.position.set(-center.x, -center.y, -center.z);
         // ==========================================
-
-        outerGroup.add(group);
 
         return outerGroup;
     },

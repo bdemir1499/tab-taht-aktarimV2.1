@@ -7529,8 +7529,8 @@ window.Scene3D = {
         if (this.isRotatingHandle && this.currentMesh) {
             const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
             const camUp = new THREE.Vector3(0, 1, 0).applyQuaternion(this.camera.quaternion);
-            this.currentMesh.rotateOnWorldAxis(camRight, (y - this.lastMousePos.y) * 0.01);
-            this.currentMesh.rotateOnWorldAxis(camUp, (x - this.lastMousePos.x) * 0.01);
+            this.currentMesh.rotateOnWorldAxis(camRight, (y - this.lastMousePos.y) * -0.01); // ASAGI CIKIYORSA YUKARI DEGIL, ASAGI DONSUN
+            this.currentMesh.rotateOnWorldAxis(camUp, (x - this.lastMousePos.x) * -0.01);
             this.lastMousePos = { x, y };
             this.updateHandlePositions();
             
@@ -8308,7 +8308,7 @@ function calculateDistance(p1, p2) {
                                         const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(window.Scene3D.camera.quaternion);
                                         const camUp = new THREE.Vector3(0, 1, 0).applyQuaternion(window.Scene3D.camera.quaternion);
                                         mesh.rotateOnWorldAxis(camUp, dx * -0.005);
-                                        mesh.rotateOnWorldAxis(camRight, dy * -0.005);
+                                        mesh.rotateOnWorldAxis(camRight, dy * 0.005); // TERSINE CEVIRILDI (YON DUZELTME)
 
                                         if (mesh.userData && mesh.userData.strokeData) {
                                             const sd = mesh.userData.strokeData;
