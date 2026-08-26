@@ -8258,6 +8258,11 @@ function calculateDistance(p1, p2) {
                                             let ratioChange = distDiff * 1.5; 
                                             let newRatio = Math.max(0, Math.min(1, startOpenRatio + ratioChange));
                                             
+                                            // MANYETIK HIZALAMA (Kilit): Gecislerde (cimdik birakirken) ellerin 
+                                            // istemsizce birkac santim oynamasinin sekli bozmasini tamamen onler.
+                                            if (newRatio > 0.90) newRatio = 1.0;
+                                            if (newRatio < 0.10) newRatio = 0.0;
+                                            
                                             const sInput = document.getElementById("shape-slider");
                                             if(sInput) sInput.value = newRatio * 100;
                                             
@@ -8293,8 +8298,9 @@ function calculateDistance(p1, p2) {
                                         const dx = px1 - startX;
                                         const dy = py1 - startY;
 
-                                        mesh.rotation.y += dx * -0.005;
-                                        mesh.rotation.x += dy * 0.005;
+                                        // Gimbal Lock Fix + Y Eksen Invert
+                                        mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), dx * -0.005);
+                                        mesh.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), dy * -0.005);
 
                                         if (mesh.userData && mesh.userData.strokeData) {
                                             const sd = mesh.userData.strokeData;
