@@ -8314,15 +8314,15 @@ function calculateDistance(p1, p2) {
                                             
                                             // ASIMETRIK CARPAN: Kapatmak (distDiff < 0) fiziksel olarak daha dar bir alanda
                                             // yapildigi icin kapatma ivmesini 2.5 yapiyoruz. Acmak 1.5 kaliyor.
-                                            let multiplier = distDiff < 0 ? 2.8 : 1.8;
+                                            // ASIMETRIK CARPAN: Hizli acilip kapanmasi icin carpanlar artirildi
+                                            let multiplier = distDiff < 0 ? 5.5 : 4.0;
                                             let ratioChange = distDiff * multiplier; 
                                             
                                             let newRatio = Math.max(0, Math.min(1, startOpenRatio + ratioChange));
                                             
-                                            // MANYETIK HIZALAMA (Kilit): Gecislerde (cimdik birakirken) ellerin 
-                                            // istemsizce birkac santim oynamasinin sekli bozmasini tamamen onler.
-                                            if (newRatio > 0.90) newRatio = 1.0;
-                                            if (newRatio < 0.10) newRatio = 0.0;
+                                            // MANYETIK HIZALAMA (Kilit): Daha kolay kapanmasi icin sinirlar genisletildi
+                                            if (newRatio > 0.85) newRatio = 1.0;
+                                            if (newRatio < 0.18) newRatio = 0.0;
                                             
                                             const sInput = document.getElementById("shape-slider");
                                             if(sInput) sInput.value = newRatio * 100;
