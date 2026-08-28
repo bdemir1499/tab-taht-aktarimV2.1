@@ -6591,11 +6591,7 @@ if (!data || !data.type) return;
                             if (sceneMesh.userData && sceneMesh.userData.strokeData) {
                                 sceneMesh.userData.strokeData.openRatio = data.stroke.openRatio;
                             }
-                            if (sceneMesh.userData.isCustomCone && window.CustomConeEngine) {
-                                window.CustomConeEngine.update(sceneMesh, data.stroke.openRatio);
-                            } else if (window.Foldable3D) {
-                                window.Foldable3D.updateUnfold(sceneMesh, data.stroke.openRatio);
-                            }
+                            // Animasyon (Lerp) pruzsuz calismasi icin buradaki anlik guncellemeler Scene3D.animate icine alindi.
                         }
 
                         if (window.Scene3D.currentMesh === sceneMesh) window.Scene3D.updateHandlePositions();
@@ -7415,10 +7411,15 @@ window.Scene3D = {
             this.scene.children.forEach(mesh => {
                 if (mesh.userData && mesh.userData.strokeData) {
                     // 🚨 KONİ ÇÖZÜMÜ: Koni ise kendi motoruyla canlandır, değilse diğerleriyle
+                    let targetRatio = mesh.userData.strokeData.openRatio || 0;
+                    if (mesh.userData.currentOpenRatio === undefined) mesh.userData.currentOpenRatio = targetRatio;
+                    mesh.userData.currentOpenRatio += (targetRatio - mesh.userData.currentOpenRatio) * 0.3;
+                    if (Math.abs(targetRatio - mesh.userData.currentOpenRatio) < 0.001) mesh.userData.currentOpenRatio = targetRatio;
+
                     if (mesh.userData.isCustomCone && window.CustomConeEngine) {
-                        window.CustomConeEngine.update(mesh, mesh.userData.strokeData.openRatio || 0);
+                        window.CustomConeEngine.update(mesh, mesh.userData.currentOpenRatio);
                     } else if (window.Foldable3D) {
-                        window.Foldable3D.updateUnfold(mesh, mesh.userData.strokeData.openRatio || 0);
+                        window.Foldable3D.updateUnfold(mesh, mesh.userData.currentOpenRatio);
                     }
                     
                     if (mesh.userData.targetQuaternion) {
@@ -8317,11 +8318,7 @@ function calculateDistance(p1, p2) {
                                             const sInput = document.getElementById("shape-slider");
                                             if(sInput) sInput.value = newRatio * 100;
                                             
-                                            if (mesh.userData.isCustomCone && window.CustomConeEngine) {
-                                                window.CustomConeEngine.update(mesh, newRatio);
-                                            } else if (window.Foldable3D) {
-                                                window.Foldable3D.updateUnfold(mesh, newRatio);
-                                            }
+                                            // Lerp animasyonu icin update fonksiyonlari Scene3D.animate'e birakildi
                                             
                                             if (mesh.userData && mesh.userData.strokeData) {
                                                 mesh.userData.strokeData.openRatio = newRatio;
