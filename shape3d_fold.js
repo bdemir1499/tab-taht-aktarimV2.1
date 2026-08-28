@@ -304,12 +304,18 @@ window.Foldable3D = {
         // formuna gecmesi gerekir! Aksi halde acik (2D) halinin merkezini alir ve SAVRULUR!
         this.updateUnfold(outerGroup, 0);
 
-        const box = new THREE.Box3().setFromObject(group);
-        const center = new THREE.Vector3();
+        let box = new THREE.Box3().setFromObject(group);
+        let center = new THREE.Vector3();
         box.getCenter(center);
-        
         group.userData.foldedCenter = center.clone();
-        group.position.set(-center.x, -center.y, -center.z);
+        
+        this.updateUnfold(outerGroup, 1);
+        box = new THREE.Box3().setFromObject(group);
+        box.getCenter(center);
+        group.userData.unfoldedCenter = center.clone();
+        
+        this.updateUnfold(outerGroup, 0);
+        group.position.set(-group.userData.foldedCenter.x, -group.userData.foldedCenter.y, -group.userData.foldedCenter.z);
         // ==========================================
 
         return outerGroup;
@@ -360,13 +366,23 @@ window.Foldable3D = {
 
             // Prizmaların açınımı yana doğru uzadığı için, açıldıkça şekli ortala
             // Pivot merkezleme (Savrulma onleyici)
-            if (group.userData.foldedCenter) {
-                const fx = -group.userData.foldedCenter.x;
-                const tx = group.userData.shiftX !== undefined ? group.userData.shiftX : fx;
+            if (group.userData.foldedCenter && group.userData.unfoldedCenter) {
+                const f = group.userData.foldedCenter;
+                const u = group.userData.unfoldedCenter;
                 
-                inner.position.x = fx + (tx - fx) * openRatio;
-                inner.position.y = -group.userData.foldedCenter.y;
-                inner.position.z = -group.userData.foldedCenter.z;
+                const curX = f.x + (u.x - f.x) * openRatio;
+                const curY = f.y + (u.y - f.y) * openRatio;
+                const curZ = f.z + (u.z - f.z) * openRatio;
+                
+                inner.position.x = -curX;
+                inner.position.y = -curY;
+                inner.position.z = -curZ;
+                
+                if (group.userData.shiftX !== undefined) {
+                    const fx = -f.x;
+                    const tx = group.userData.shiftX;
+                    inner.position.x = fx + (tx - fx) * openRatio;
+                }
             } else if (group.userData.shiftX) {
                 inner.position.x = group.userData.shiftX * openRatio;
             }
