@@ -8245,8 +8245,13 @@ function calculateDistance(p1, p2) {
                     const isTwoHands = results.multiHandLandmarks.length === 2;
                     const hand1 = results.multiHandLandmarks[0];
                     
-                    const px1 = (1 - hand1[8].x) * window.innerWidth;
-                    const py1 = hand1[8].y * window.innerHeight;
+                    const rawPx1 = (1 - hand1[8].x) * window.innerWidth;
+                    const rawPy1 = hand1[8].y * window.innerHeight;
+                    if (window.smoothPx1 === undefined) { window.smoothPx1 = rawPx1; window.smoothPy1 = rawPy1; }
+                    window.smoothPx1 += (rawPx1 - window.smoothPx1) * 0.25; // 0.25 EMA Yumusatma Filtresi (Titremeyi yutar)
+                    window.smoothPy1 += (rawPy1 - window.smoothPy1) * 0.25;
+                    const px1 = window.smoothPx1;
+                    const py1 = window.smoothPy1;
                     laserCursor.style.display = 'block';
                     laserCursor.style.left = px1 + 'px';
                     laserCursor.style.top = py1 + 'px';
@@ -8390,6 +8395,8 @@ function calculateDistance(p1, p2) {
                                     if (startX !== 0 && startY !== 0) {
                                         const dx = px1 - startX;
                                         const dy = py1 - startY;
+                                        
+                                        if (Math.abs(dx) > 1.0 || Math.abs(dy) > 1.0) { // Deadzone: Sadece gercek hareketlerde don!
 
                                         // Gimbal Lock Fix + Trackball (Dunya Maketi) Eksen Donusumu
                                         const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(window.Scene3D.camera.quaternion);
@@ -8411,6 +8418,7 @@ function calculateDistance(p1, p2) {
                                             sd.rotationZ = euler.z;
                                             if (typeof window.sendNetworkData === "function") { window.sendNetworkData({ type: "sekil_guncelle", stroke: sd }); }
                                         }
+                                        } // Deadzone sonu
                                     }
                                     startX = px1;
                                     startY = py1;
