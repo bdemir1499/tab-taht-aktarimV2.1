@@ -8448,8 +8448,8 @@ function calculateDistance(p1, p2) {
                                         }
                                         const dummy = new THREE.Object3D();
                                         dummy.quaternion.copy(mesh.userData.targetQuaternion);
-                                        dummy.rotateOnWorldAxis(camUp, dx * 0.008); // 0.005'ten 0.008'e cikarildi (Daha hizli donus)
-                                        dummy.rotateOnWorldAxis(camRight, dy * 0.008); // Ters donme sorunu icin - silindi (Yeşil butonla ayni yapildi)
+                                        dummy.rotateOnWorldAxis(camUp, -dx * 0.008); // 0.005'ten 0.008'e cikarildi (Daha hizli donus)
+                                        dummy.rotateOnWorldAxis(camRight, -dy * 0.008); // Ters donme sorunu icin - silindi (Yeşil butonla ayni yapildi)
                                         mesh.userData.targetQuaternion.copy(dummy.quaternion);
 
                                         if (mesh.userData && mesh.userData.strokeData) {
