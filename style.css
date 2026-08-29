@@ -1128,3 +1128,15 @@ canvas {
     background: #89b4fa !important; /* Yeni temanın pastel mavisi */
     border-radius: 10px !important;
 }
+
+/* GHOST MODE: Cizim yaparken panelleri seffaflastirir */
+body.ghost-mode .left-panel,
+body.ghost-mode .right-panel {
+    opacity: 0.1 !important;
+    pointer-events: none !important;
+    transform: scale(0.95);
+}
+
+.left-panel, .right-panel {
+    transition: opacity 0.3s ease, transform 0.3s ease !important;
+}
