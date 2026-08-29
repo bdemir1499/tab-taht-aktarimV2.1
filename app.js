@@ -2571,6 +2571,13 @@ if (pageCountLabel) {
 if (uploadButton && fileInput) {
     uploadButton.onclick = () => fileInput.click();
 
+    const cameraBtn = document.getElementById('btn-camera');
+    const cameraInput = document.getElementById('camera-input');
+    if (cameraBtn && cameraInput) {
+        cameraBtn.onclick = () => cameraInput.click();
+        cameraInput.onchange = async (e) => fileInput.onchange(e);
+    }
+
     fileInput.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
