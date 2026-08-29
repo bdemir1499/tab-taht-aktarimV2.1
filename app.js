@@ -8244,8 +8244,7 @@ function calculateDistance(p1, p2) {
         tonyBtn.style.boxShadow = '0 0 10px rgba(255,255,0,0.5)';
 
         try {
-            await loadScript('mediapipe/camera_utils.js');
-            await loadScript('mediapipe/hands.js');
+            // Scripts artik index.html icinde erkenden yukleniyor.
 
             const videoElement = document.createElement('video');
             videoElement.setAttribute('playsinline', '');
@@ -8265,7 +8264,7 @@ function calculateDistance(p1, p2) {
             document.body.appendChild(videoElement);
 
             hands = new window.Hands({
-                locateFile: (file) => 'mediapipe/' + file
+                locateFile: (file) => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + file
             });
 
             hands.setOptions({
