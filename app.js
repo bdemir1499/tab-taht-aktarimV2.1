@@ -5736,6 +5736,10 @@ myPeer.on('connection', function (conn) {
         requestModal.classList.remove('hidden');
         requestModal.style.display = 'flex';
 
+        // Yaris Kosulunu (Race Condition) onlemek icin open eventini onceden dinle
+        let wasOpenedEarly = false;
+        conn.on('open', () => { wasOpenedEarly = true; });
+
         btnAccept.onclick = function () {
             try {
                 myConnection = conn;
@@ -5767,7 +5771,7 @@ myPeer.on('connection', function (conn) {
                     }, 500);
                 };
 
-                if (conn.open) {
+                if (conn.open || wasOpenedEarly) {
                     baglantiHazir();
                 } else {
                     conn.on('open', baglantiHazir);
