@@ -1214,9 +1214,33 @@ body.ghost-mode .right-panel {
 
     /* Mobilde Panel Iceriginin Sigmamasi Sorununu Coz (Kaydirilabilir Yap) */
     .left-panel, .right-panel {
-        max-height: 85vh !important; /* Ekranin asagisindan tasma yapmasin */
+         /* Ekranin asagisindan tasma yapmasin */
         overflow-y: auto !important; /* Tasan kisimlar icin dikey kaydirma cubugu */
         overflow-x: hidden !important;
+    }
+
+
+
+    /* MOBILDE PANELLERIN EKRANA TAM SIGMASI (URL CUBUGU HATASI COZUMU) */
+    .left-panel, .right-panel {
+        top: 10px !important;
+        bottom: 10px !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+    
+    .left-panel {
+        transform: translateX(-120%) !important;
+    }
+    
+    .right-panel {
+        transform: translateX(120%) !important;
+    }
+    
+    .left-panel.drawer-open, .right-panel.drawer-open {
+        transform: translateX(0) !important;
     }
 
     /* Mobilde alt menuler (Cizgi, Cokgenler) saga dogru degil, ASAGI dogru acilsin!
