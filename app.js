@@ -6376,6 +6376,12 @@ if (!data || !data.type) return;
                     z-index: -9999 !important;
                 }
                 
+                #app-container {
+                    display: block !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                }
+                
                 /* Çizim Alanı ve Sol/Sağ Menüleri KESİN OLARAK ÖNE ÇIKARIR */
                 #drawing-canvas, #bg-canvas {
                     display: block !important;
@@ -6395,6 +6401,9 @@ if (!data || !data.type) return;
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
+            
+            const appCont = document.getElementById('app-container');
+            if (appCont) appCont.style.display = 'block';
 
             // PC ağ panelini küçülten/yok eden yerel fonksiyonu tetikle (Eğer HTML'de varsa)
             if (typeof window.kucultPanel === 'function') {
