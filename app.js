@@ -8283,15 +8283,7 @@ function calculateDistance(p1, p2) {
             window.lastAISendTime = 0;
 
             hands.onResults((results) => {
-    // KESKIN NISANCI (SNIPER) KOORDINAT DUZELTMESI
-    if (window.isSniperModeActive && results.multiHandLandmarks) {
-        for (const hand of results.multiHandLandmarks) {
-            for (const lm of hand) {
-                lm.x = (lm.x * 0.6) + 0.2;
-                lm.y = (lm.y * 0.6) + 0.2;
-            }
-        }
-    }
+
                 tonyBtn.innerHTML = 'AI Aktif';
                 if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                     tonyBtn.innerHTML = 'El Göründü!';
@@ -8316,7 +8308,8 @@ function calculateDistance(p1, p2) {
                                     (calculateDistance(hand1[12], hand1[9]) / handScale1) < 0.6 && 
                                     (calculateDistance(hand1[16], hand1[13]) / handScale1) < 0.6 && 
                                     (calculateDistance(hand1[20], hand1[17]) / handScale1) < 0.6;
-                    const isPinched1 = !isFist1 && ((pinchDist1 / handScale1) < 0.45); // Hassasiyet artirildi 
+                    const dynamicPinch1 = (handScale1 > 0.12) ? 0.30 : 0.45;
+                    const isPinched1 = !isFist1 && ((pinchDist1 / handScale1) < dynamicPinch1); 
 
                     if (window.Scene3D) {
                         let mesh = window.Scene3D.currentMesh;
@@ -8332,7 +8325,8 @@ function calculateDistance(p1, p2) {
                                                 (calculateDistance(hand2[12], hand2[9]) / handScale2) < 0.6 && 
                                                 (calculateDistance(hand2[16], hand2[13]) / handScale2) < 0.6 && 
                                                 (calculateDistance(hand2[20], hand2[17]) / handScale2) < 0.6;
-                                const isPinched2 = !isFist2 && ((pinchDist2 / handScale2) < 0.45);
+                                const dynamicPinch2 = (handScale2 > 0.12) ? 0.30 : 0.45;
+                                const isPinched2 = !isFist2 && ((pinchDist2 / handScale2) < dynamicPinch2);
                                 const handsDistance = calculateDistance(hand1[8], hand2[8]);
 
                                 // Hata onleme: Iki el birbirinden en az %15 uzak olmali (yanlis algilamalari onler)
@@ -8491,7 +8485,7 @@ function calculateDistance(p1, p2) {
                 }
             });
 
-            // 4LU UZUN MENZIL KOMBO (1080p + PTZ Zoom + Canvas Crop)
+            // YENI: Genis Acili 1080p Ozel Kamera (Dinamik Adaptasyon Modu)
             camera = {
                 stream: null,
                 isRunning: false,
@@ -8501,41 +8495,15 @@ function calculateDistance(p1, p2) {
                             video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode: 'user' }
                         });
                         videoElement.srcObject = this.stream;
-                        
-                        // PTZ Zoom Hack
-                        const [track] = this.stream.getVideoTracks();
-                        const capabilities = track.getCapabilities ? track.getCapabilities() : {};
-                        if (capabilities.zoom) {
-                            try {
-                                const zoomVal = Math.min(capabilities.zoom.max, capabilities.zoom.min + (capabilities.zoom.max - capabilities.zoom.min) * 0.5);
-                                await track.applyConstraints({ advanced: [{ zoom: zoomVal }] });
-                            } catch(e){}
-                        }
-
                         await videoElement.play();
                         this.isRunning = true;
-                        window.isSniperModeActive = true;
+                        window.isSniperModeActive = false;
                         
-                        if (!window.sniperCanvas) {
-                            window.sniperCanvas = document.createElement('canvas');
-                            window.sniperCtx = window.sniperCanvas.getContext('2d', { willReadFrequently: true });
-                        }
-
                         const processFrame = async () => {
                             if (!this.isRunning) return;
                             if (videoElement.readyState >= 2) {
-                                const vw = videoElement.videoWidth || 640;
-                                const vh = videoElement.videoHeight || 480;
-                                const cw = vw * 0.6;
-                                const ch = vh * 0.6;
-                                const cx = vw * 0.2;
-                                const cy = vh * 0.2;
-                                
-                                window.sniperCanvas.width = cw;
-                                window.sniperCanvas.height = ch;
-                                window.sniperCtx.drawImage(videoElement, cx, cy, cw, ch, 0, 0, cw, ch);
-                                
-                                await hands.send({image: window.sniperCanvas});
+                                // Dogrudan video elementini gonder (Kirpma YOK, Zoom YOK)
+                                await hands.send({image: videoElement});
                             }
                             requestAnimationFrame(processFrame);
                         };
