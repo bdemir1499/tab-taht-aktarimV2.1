@@ -2569,12 +2569,12 @@ if (pageCountLabel) {
 }
 
 if (uploadButton && fileInput) {
-    uploadButton.onclick = () => fileInput.click();
+    // uploadButton.onclick kaldirildi
 
     const cameraBtn = document.getElementById('btn-camera');
     const cameraInput = document.getElementById('camera-input');
     if (cameraBtn && cameraInput) {
-        cameraBtn.onclick = () => cameraInput.click();
+        // cameraBtn.onclick kaldirildi
         cameraInput.onchange = async (e) => fileInput.onchange(e);
     }
 
