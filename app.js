@@ -7656,6 +7656,12 @@ window.Scene3D = {
             const intersectPoint = new THREE.Vector3();
             if (this.raycaster.ray.intersectPlane(this.dragPlane, intersectPoint)) {
                 this.currentMesh.position.addVectors(intersectPoint, this.dragOffset);
+                
+                // BOUNDARY CLAMP: Ekran disina ucmasini (kaybolmasini) engeller
+                this.currentMesh.position.x = Math.max(-30, Math.min(30, this.currentMesh.position.x));
+                this.currentMesh.position.y = Math.max(-30, Math.min(30, this.currentMesh.position.y));
+                this.currentMesh.position.z = Math.max(-30, Math.min(30, this.currentMesh.position.z));
+
                 this.updateHandlePositions();
                 // Taşıma sırasındaki ağ senkronu zaten 2D motoru tarafından kusursuz yapılıyor. Burada hiçbir şeye dokunmuyoruz!
             }
@@ -8420,6 +8426,12 @@ function calculateDistance(p1, p2) {
                                         const intersectPoint = new THREE.Vector3();
                                         if (window.Scene3D.raycaster.ray.intersectPlane(window.Scene3D.dragPlane, intersectPoint)) {
                                             const targetPos = new THREE.Vector3().addVectors(intersectPoint, window.Scene3D.dragOffset);
+                                            
+                                            // BOUNDARY CLAMP: Ekran disina ucmasini (kaybolmasini) engeller
+                                            targetPos.x = Math.max(-30, Math.min(30, targetPos.x));
+                                            targetPos.y = Math.max(-30, Math.min(30, targetPos.y));
+                                            targetPos.z = Math.max(-30, Math.min(30, targetPos.z));
+
                                             if (!mesh.userData.targetPosition) mesh.userData.targetPosition = mesh.position.clone();
                                             mesh.userData.targetPosition.copy(targetPos);
                                             
