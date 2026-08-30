@@ -5683,7 +5683,7 @@ if (isTablet) {
     
     myPeer.on('error', (err) => { 
         if (idSaha) idSaha.innerText = "Sunucu Hatası!"; 
-        alert("Ücretsiz Sunucuya (PeerJS) şu an ulaşılamıyor. Lütfen sayfayı 1 dakika sonra yenileyin. Hata: " + err.type); 
+        console.warn("PeerJS Arka Plan Hatası (Gözardı edilebilir): " + err.type); 
     });
 }
 // --- 3. BAĞLANTI İSTEK DİNLEYİCİSİ (KAPI ZİLİ) ---
