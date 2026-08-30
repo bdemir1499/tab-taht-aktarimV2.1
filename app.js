@@ -8272,7 +8272,7 @@ function calculateDistance(p1, p2) {
 
             hands.setOptions({
                 maxNumHands: 2, 
-                modelComplexity: 0,
+                modelComplexity: 1, // 1 yapildi, uzaktan daha iyi algilamasi icin
                 minDetectionConfidence: 0.5,
                 minTrackingConfidence: 0.5
             });
@@ -8307,7 +8307,7 @@ function calculateDistance(p1, p2) {
                                     (calculateDistance(hand1[12], hand1[9]) / handScale1) < 0.6 && 
                                     (calculateDistance(hand1[16], hand1[13]) / handScale1) < 0.6 && 
                                     (calculateDistance(hand1[20], hand1[17]) / handScale1) < 0.6;
-                    const isPinched1 = !isFist1 && ((pinchDist1 / handScale1) < 0.35); 
+                    const isPinched1 = !isFist1 && ((pinchDist1 / handScale1) < 0.45); // Hassasiyet artirildi 
 
                     if (window.Scene3D) {
                         let mesh = window.Scene3D.currentMesh;
@@ -8323,7 +8323,7 @@ function calculateDistance(p1, p2) {
                                                 (calculateDistance(hand2[12], hand2[9]) / handScale2) < 0.6 && 
                                                 (calculateDistance(hand2[16], hand2[13]) / handScale2) < 0.6 && 
                                                 (calculateDistance(hand2[20], hand2[17]) / handScale2) < 0.6;
-                                const isPinched2 = !isFist2 && ((pinchDist2 / handScale2) < 0.35);
+                                const isPinched2 = !isFist2 && ((pinchDist2 / handScale2) < 0.45);
                                 const handsDistance = calculateDistance(hand1[8], hand2[8]);
 
                                 // Hata onleme: Iki el birbirinden en az %15 uzak olmali (yanlis algilamalari onler)
