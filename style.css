@@ -1256,3 +1256,20 @@ body.ghost-mode .right-panel {
     }
 
 }
+
+/* MOBILDE 3D MENULERINI AŞAĞI İTECEK ŞEKİLDE DÜZELTME */
+@media (max-width: 768px) {
+    #options-3d-main, #options-prizmalar, #options-piramitler {
+        position: static !important;
+        left: 0 !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important;
+        background-color: rgba(13, 13, 43, 0.5) !important;
+        border: none !important;
+        padding: 10px !important;
+        margin-bottom: 5px !important;
+        margin-top: 5px !important;
+    }
+}
