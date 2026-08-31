@@ -2688,7 +2688,8 @@ if (uploadButton && fileInput) {
             };
             reader.readAsDataURL(file);
         }
-        e.target.value = '';
+        // Resim/Dosya islenmeden value'yu temizlemek mobil tarayicilarda File objesinin silinmesine (GC) neden olur!
+        setTimeout(() => { e.target.value = ''; }, 2000); 
     };
 }
 
@@ -7118,7 +7119,7 @@ window.sendNetworkData = function (dataPackage) {
             let i = 0;
             const kargoBarkodu = Date.now().toString() + Math.floor(Math.random() * 1000);
             function paketGonder() {
-                if (!myConnection || !myConnection.open) return;
+                if (!myConnection || (!myConnection.open && !window.isConnected)) return;
                 if (myConnection.dataChannel && myConnection.dataChannel.bufferedAmount > 64000) { setTimeout(paketGonder, 50); return; }
                 if (i < dataString.length) {
                     myConnection.send({ type: 'chunk', msgId: kargoBarkodu, data: dataString.substring(i, i + CHUNK_SIZE), isLast: (i + CHUNK_SIZE >= dataString.length) });
@@ -7139,7 +7140,7 @@ window.sendNetworkData = function (dataPackage) {
                     let i = 0;
                     const kargoBarkodu = Date.now().toString() + Math.floor(Math.random() * 1000);
                     function paketGonderTahta() {
-                        if (!conn || !conn.open) return;
+                        if (!conn || (!conn.open && !window.isConnected)) return;
                         if (conn.dataChannel && conn.dataChannel.bufferedAmount > 64000) { setTimeout(paketGonderTahta, 50); return; }
                         if (i < dataString.length) {
                             conn.send({ type: 'chunk', msgId: kargoBarkodu, data: dataString.substring(i, i + CHUNK_SIZE), isLast: (i + CHUNK_SIZE >= dataString.length) });
