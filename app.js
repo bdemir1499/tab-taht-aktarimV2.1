@@ -642,7 +642,7 @@ window.OyunListesi = [
 // --- BURAYA YAPIŞTIR ---
 window.sendNetworkData = function (dataObj) {
     // 1. Durum: Eğer bu cihaz TABLET ise (tahtaya bağlıyız)
-    if (typeof myConnection !== 'undefined' && myConnection && myConnection.open) {
+    if (typeof myConnection !== 'undefined' && myConnection && (myConnection.open || window.isConnected)) {
         myConnection.send(dataObj);
     }
     // 2. Durum: Eğer bu cihaz AKILLI TAHTA ise (bağlı olan tabletlere gönder)
@@ -7111,7 +7111,7 @@ window.sendNetworkData = function (dataPackage) {
     const CHUNK_SIZE = 8000;
 
     // DURUM 1: Tabletsek Tahtaya Gönder
-    if (typeof isConnected !== 'undefined' && isConnected && typeof myConnection !== 'undefined' && myConnection && myConnection.open) {
+    if (typeof isConnected !== 'undefined' && isConnected && typeof myConnection !== 'undefined' && myConnection && (myConnection.open || window.isConnected)) {
         if (dataString.length <= CHUNK_SIZE) {
             myConnection.send(dataPackage);
         } else {
